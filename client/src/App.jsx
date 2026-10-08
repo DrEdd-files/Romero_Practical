@@ -11,6 +11,36 @@ function App() {
   const [course, setCourse] = useState("");
   const [age, setAge] = useState("");
 
+  //Task 4
+  const [editingId, setEditingId] = useState(null);
+
+  const editStudent = (student) =>{
+    setEditingId(student._id);
+    setName(student.name);
+    setCourse(student.course);
+    setAge(student.age);
+  }
+
+  const updateStudent = () =>{
+    axios
+    .put(`http://localhost:5000/students/${editingId}`, {
+      name: name,
+      course: course,
+      age: age,
+    })
+    .then(() =>{
+      axios
+      .get("http://localhost:5000/students")
+      .then((response) =>{
+        setStudents(response.data);
+      });
+      setEditingId(null);
+      setName("");
+      setCourse("");
+      setAge("");
+    });
+  }
+
   useEffect(() =>{
 
     axios
@@ -70,7 +100,13 @@ function App() {
       <input placeholder="Age" value={age} onChange={(event) => setAge(event.target.value)}/>
       <br /><br />
 
-      <button onClick={addStudent}>Add Student</button>
+      {/* <button onClick={addStudent}>Add Student</button> */}
+
+      {editingId === null ? (
+        <button onClick={addStudent}>Add Student</button>
+      ) : (
+        <button onClick={updateStudent}>Update Student</button>
+      )} 
 
       <h2>Students</h2>
       
@@ -83,7 +119,7 @@ function App() {
           <p>Course: {student.course}</p>
           <p>Age: {student.age}</p>
 
-          <button>Edit</button>
+          <button onClick={() => editStudent(student)}>Edit</button>
           <button onClick={() => deleteStudent(student._id)}>Delete</button>
           
           <hr />
